@@ -1,75 +1,79 @@
-<div align="center">
+# 🤖 CogniDesk AI — Autonomous Enterprise Customer Support & Multi-Channel Contact Center
 
-# CogniDesk AI ⚡
-### Enterprise Autonomous Customer Support & Multi-Channel AI Contact Center
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-indigo.svg)](https://opensource.org/licenses/MIT)
-[![React 19](https://img.shields.io/badge/React-19-cyan.svg)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
-[![Tailwind CSS v4](https://img.shields.io/badge/TailwindCSS-v4.0-emerald.svg)](https://tailwindcss.com/)
-[![Zustand](https://img.shields.io/badge/State-Zustand-orange.svg)](https://github.com/pmndrs/zustand)
-[![Deflection Rate](https://img.shields.io/badge/AI_Deflection-84.3%25-brightgreen.svg)]()
-[![CSAT](https://img.shields.io/badge/CSAT-4.92%2F5.0-purple.svg)]()
-
-*Tier-1 Autonomous Contact Center & Copilot Engine competing with Zendesk AI, Intercom Fin, Sierra, and Decagon.*
-
-</div>
+<p align="center">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" />
+  <img src="https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/React-19.x-61dafb?logo=react" alt="React" />
+  <img src="https://img.shields.io/badge/Vite-8.x-646CFF?logo=vite" alt="Vite" />
+  <img src="https://img.shields.io/badge/TailwindCSS-v4-38B2AC?logo=tailwind-css" alt="Tailwind v4" />
+  <img src="https://img.shields.io/badge/Architecture-Clean%20Enterprise-emerald" alt="Design" />
+</p>
 
 ---
 
 ## 🌟 Overview
 
-**CogniDesk AI** is an enterprise-grade autonomous customer support platform engineered for high-throughput multi-channel environments. It combines multi-step Chain-of-Thought (CoT) reasoning, real-time RAG knowledge base grounding, human-in-the-loop escalation cockpits, visual resolution playbooks, and omnichannel routing (Live Chat, WhatsApp Business, Email, Voice Telephony).
+**CogniDesk AI** is an enterprise-grade, autonomous customer support studio and multi-channel contact center. Designed with a calm, high-efficiency **Linear / Stripe aesthetic**, CogniDesk combines **verifiable RAG grounding**, real-time **Chain-of-Thought (CoT) reasoning traces**, **1-click resolution playbooks**, and seamless **Autonomous AI ⇋ Human Agent handovers**.
 
 ---
 
-## 🚀 Core Capabilities
+## ⚡ Key Highlights
 
-### 1. 📬 Unified Omnichannel Live Inbox
-- **Multi-Channel Orchestration**: Live Web Chat, WhatsApp Business API, Email Tickets, Voice Call Transcripts, and SMS.
-- **SLA Countdown Radar**: Real-time SLA breach prevention timers with dynamic priority escalation (Urgent, High, Medium, Low).
-- **Sentiment Telemetry**: Live customer emotional status tracking (Positive, Neutral, Frustrated, Churn Risk) with trajectory graphs.
-
-### 2. 🧠 Autonomous Reasoning Engine & RAG Copilot
-- **Chain-of-Thought (CoT) Step Inspector**: Inspect real-time intent parsing, entity extraction, vector retrieval, and policy safety checks.
-- **Grounded Knowledge Citations**: Verifiable citations with similarity confidence percentages (e.g. `98% Match` from Help Center articles).
-- **Adaptive Multi-Tone Switcher**: Instant 1-click tone transformation across *Empathetic*, *Professional*, *Concise*, and *Technical*.
-
-### 3. 👥 Human-in-the-Loop (HITL) Escalation Cockpit
-- **Seamless Autonomous/Human Handover**: 1-click takeover between autonomous AI agent and human support specialist.
-- **Internal Whisper Notes**: Private internal team collaboration notes invisible to customers.
-- **Customer 360 Profile Sidebar**: Plan Tier, MRR, Lifetime Value, Stripe Billing status, and CRM timeline history.
-
-### 4. 📚 Knowledge Base & Vector Ingestion Studio
-- **Markdown Help Center Editor**: Author, categorize, and auto-embed articles into 1536-dimensional vector space.
-- **AI Knowledge Gap Radar**: Discovers unanswered customer queries and provides 1-click auto-drafting for missing documentation.
-
-### 5. ⚡ Visual Resolution Playbooks (Automation Engine)
-- **Node-based Automation Engine**: Build visual workflows for *Autonomous Stripe Pro-Rated Refunds*, *VIP Churn Deflection*, and *Jira Bug Creators*.
-- **Interactive Step Runner**: Execute test payloads with visual active node highlighting and execution logging.
-
-### 6. 📊 Executive Contact Center Intelligence & CSAT Radar
-- **AI Deflection Rate**: Real-time 84.3% autonomous resolution tracking.
-- **BPO Labor Cost Savings**: Real-time financial ROI calculation ($142,600+ saved).
-- **Hourly Sentiment Trends & CSAT Breakdown**: Heatmaps across peak hours and communication channels.
-
-### 7. 🎭 Live Simulation Suite
-- **End-User Floating Chat Widget**: Test conversational flows directly as a customer in real-time.
-- **Voice Call Telephony Simulator**: Simulated SIP phone call with animated audio waveforms and transcript diarization.
+- **🧠 Transparent Chain-of-Thought (CoT) Reasoning**: Inspect exact decision steps, grounded citations, and execution telemetry for every AI response.
+- **💬 Distraction-Free Conversation Canvas**: High-readability chat streams with Markdown support, sentiment analysis, and private team whisper notes (`⌘ + Enter` composer).
+- **🪟 Collapsible Context Inspector (`⌘I`)**:
+  - **Copilot**: Grounded knowledge citations, real-time confidence rating, and tone switcher (*Empathetic*, *Professional*, *Concise*, *Technical*).
+  - **Customer 360**: Real-time revenue telemetry (MRR, Lifetime Value, Stripe Status, SLA clocks).
+  - **Docs Search**: In-context knowledge base lookup with 1-click snippet insertion into chat.
+  - **Resolution Playbooks**: 1-click execution for Stripe pro-rated refunds, VIP Slack alarms, and Jira tickets.
+- **📚 Integrated Knowledge Base (GitBook / Mintlify Style)**: Category-driven documentation hub with high-dimensional vector embeddings and live gap resolution.
+- **⚡ Automated Resolution Workflows**: Visual node pipeline with step-by-step test execution.
+- **📊 Real-Time Analytics & CSAT Telemetry**: Live deflection rate tracking, hourly customer sentiment trends, and channel volume distribution.
+- **🎭 Multi-Channel Simulation Studio**: Built-in end-user widget simulator and Voice SIP telephony testing modal.
+- **⌨️ Global Command Palette (`⌘K`)**: Instant fuzzy search across tickets, docs, workflows, and settings.
 
 ---
 
-## 🏗️ Tech Stack & Architecture
+## 🛠️ Architecture & Tech Stack
 
-- **Frontend**: React 19, TypeScript 5.8, Tailwind CSS v4, Vite 8
-- **State Management**: Zustand (Reactive event stream)
-- **Icons & UI**: Lucide React, Glassmorphism design system (Zero informal emojis)
-- **Visuals & Effects**: Canvas Confetti, JetBrains Mono typography
+```
+cognidesk-ai/
+├── src/
+│   ├── components/
+│   │   ├── inbox/              # TicketList, ConversationView, ContextInspectorPanel
+│   │   ├── knowledge/          # KnowledgeBaseHub, ArticleEditorModal
+│   │   ├── playbooks/          # PlaybookBuilder (Visual Node Runner)
+│   │   ├── analytics/          # AnalyticsDashboard (CSAT & Deflection metrics)
+│   │   ├── settings/           # IntegrationSettings (Stripe, Slack, Okta, Jira)
+│   │   ├── simulation/         # CustomerWidgetModal, VoiceCallModal
+│   │   └── layout/             # TopHeader, CommandPalette
+│   ├── data/                   # Mock omnichannel tickets, docs, playbooks, analytics
+│   ├── engine/                 # AI Reasoning Engine, RAG similarity matcher, tone switcher
+│   ├── store/                  # Zustand state management
+│   ├── types/                  # Domain TypeScript interfaces
+│   ├── App.tsx                 # Root application layout
+│   └── main.tsx                # Entry point
+├── index.html
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
+```
+
+- **Frontend**: React 19, TypeScript 5.9, Vite 8
+- **Styling**: Tailwind CSS v4 (`@tailwindcss/vite`), Obsidian & Zinc Design Tokens
+- **Icons**: Lucide React
+- **State Management**: Zustand
+- **Utility**: clsx, tailwind-merge, canvas-confetti
 
 ---
 
-## 🛠️ Quickstart & Local Setup
+## 🚀 Quick Start
 
+### Prerequisites
+- Node.js >= 18.0.0
+- npm >= 9.0.0
+
+### Installation
 ```bash
 # 1. Clone the repository
 git clone https://github.com/VarshuAi/cognidesk-ai.git
@@ -82,20 +86,34 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Visit `http://localhost:5173` in your browser.
 
 ---
 
-## ⌨️ Keyboard Shortcuts
+## 🧪 Production Build
 
-| Shortcut | Action |
-| :--- | :--- |
-| `Ctrl + K` / `Cmd + K` | Global Command Palette & Search |
-| `Enter` | Send Message / Internal Whisper Note |
-| `Shift + Enter` | Newline in Chat Box |
+```bash
+# Compile TypeScript and bundle production assets
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on our code of conduct and development workflow.
+
+---
+
+## 🔒 Security
+
+For security vulnerabilities and bug reports, please review our [`SECURITY.md`](./SECURITY.md) policy.
 
 ---
 
 ## 📄 License
 
-MIT License &copy; 2026 [Varshan Gowda (VarshuAi)](https://github.com/VarshuAi).
+This project is licensed under the [MIT License](./LICENSE) © 2026 **Varshan Gowda (VarshuAi)**.
