@@ -2,40 +2,44 @@
 
 @layer base {
   body {
-    background-color: #080b14;
-    color: #f8fafc;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #09090b;
+    color: #f4f4f5;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     min-height: 100vh;
     overflow: hidden;
     user-select: none;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
+/* Subtle, clean scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.4);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(51, 65, 85, 0.6);
+  background: #27272a;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.6);
+  background: #3f3f46;
 }
 
-.glass-panel {
-  background: rgba(13, 18, 33, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+.border-subtle {
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
-.glass-dropdown {
-  background: rgba(9, 13, 24, 0.96);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.bg-surface {
+  background-color: #121215;
+}
+
+.bg-surface-raised {
+  background-color: #18181b;
+}
+
+.bg-surface-subtle {
+  background-color: #27272a;
 }

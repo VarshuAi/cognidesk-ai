@@ -16,19 +16,14 @@ export function App() {
   const { activeTab } = useDeskStore();
 
   return (
-    <div className="flex flex-col w-screen h-screen overflow-hidden bg-[#080b14] text-slate-100 font-sans">
+    <div className="flex flex-col w-screen h-screen overflow-hidden bg-[#09090b] text-zinc-100 font-sans">
       <TopHeader />
 
-      <main className="flex-1 flex h-[calc(100vh-64px)] overflow-hidden">
+      <main className="flex-1 flex h-[calc(100vh-52px)] overflow-hidden">
         {activeTab === 'inbox' && (
           <div className="flex-1 flex w-full h-full overflow-hidden">
-            {/* Left Queue Panel */}
             <TicketList />
-
-            {/* Center Primary Canvas */}
             <ConversationView />
-
-            {/* Right Modular Tabbed Inspector */}
             <ContextInspectorPanel />
           </div>
         )}

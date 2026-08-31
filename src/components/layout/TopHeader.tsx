@@ -7,14 +7,13 @@ import {
   BarChart3, 
   Settings, 
   Radio, 
-  Clock, 
+  PanelRight, 
   Sparkles, 
   PhoneCall, 
-  MessageSquarePlus,
+  MessageSquarePlus, 
   Search
 } from 'lucide-react';
 import { useDeskStore, ActiveTab } from '../../store/useDeskStore';
-import confetti from 'canvas-confetti';
 
 export const TopHeader: React.FC = () => {
   const { 
@@ -22,6 +21,8 @@ export const TopHeader: React.FC = () => {
     setActiveTab, 
     tickets, 
     metrics, 
+    isInspectorOpen, 
+    toggleInspector,
     triggerSimulatedCustomerMessage, 
     setCustomerSimulatorOpen, 
     setVoiceModalOpen,
@@ -30,56 +31,49 @@ export const TopHeader: React.FC = () => {
 
   const openTicketsCount = tickets.filter(t => t.status !== 'resolved').length;
 
-  const tabs: Array<{ id: ActiveTab; label: string; icon: React.ReactNode; badge?: number | string }> = [
-    { id: 'inbox', label: 'Omnichannel Inbox', icon: <Inbox className="w-4 h-4" />, badge: openTicketsCount },
-    { id: 'knowledge', label: 'Knowledge Base', icon: <BookOpen className="w-4 h-4" /> },
-    { id: 'playbooks', label: 'Playbooks', icon: <Workflow className="w-4 h-4" />, badge: '3 Active' },
-    { id: 'analytics', label: 'CSAT & Deflection', icon: <BarChart3 className="w-4 h-4" /> },
-    { id: 'settings', label: 'Integrations', icon: <Settings className="w-4 h-4" /> },
+  const navItems: Array<{ id: ActiveTab; label: string; icon: React.ReactNode; badge?: number | string }> = [
+    { id: 'inbox', label: 'Inbox', icon: <Inbox className="w-3.5 h-3.5" />, badge: openTicketsCount },
+    { id: 'knowledge', label: 'Docs', icon: <BookOpen className="w-3.5 h-3.5" /> },
+    { id: 'playbooks', label: 'Workflows', icon: <Workflow className="w-3.5 h-3.5" /> },
+    { id: 'analytics', label: 'Metrics', icon: <BarChart3 className="w-3.5 h-3.5" /> },
+    { id: 'settings', label: 'Settings', icon: <Settings className="w-3.5 h-3.5" /> },
   ];
 
-  const handleSimulate = () => {
-    triggerSimulatedCustomerMessage();
-    confetti({ particleCount: 40, spread: 50, origin: { y: 0.2 } });
-  };
-
   return (
-    <header className="h-16 px-6 bg-[#080c18] border-b border-slate-800/80 flex items-center justify-between shrink-0 select-none z-20">
+    <header className="h-13 px-4 bg-[#09090b] border-b border-zinc-800/80 flex items-center justify-between shrink-0 select-none z-20">
+      {/* Left: Brand & Navigation */}
       <div className="flex items-center gap-6">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-400 p-[1px] shadow-md shadow-indigo-500/20">
-            <div className="w-full h-full bg-[#0d1326] rounded-[11px] flex items-center justify-center">
-              <Bot className="w-4 h-4 text-indigo-400" />
-            </div>
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700/60 flex items-center justify-center text-zinc-100">
+            <Bot className="w-4 h-4 text-indigo-400" />
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm font-extrabold text-white tracking-tight">CogniDesk</span>
-              <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300 border border-indigo-800/60">AI</span>
-            </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-bold text-zinc-100 tracking-tight">CogniDesk</span>
+            <span className="text-[10px] font-mono text-zinc-500">AI</span>
           </div>
         </div>
 
-        <nav className="flex items-center gap-1 bg-[#0d1222] p-1 rounded-2xl border border-slate-800">
-          {tabs.map(tab => {
-            const isActive = activeTab === tab.id;
+        {/* Calm Navigation Tabs */}
+        <nav className="flex items-center gap-1">
+          {navItems.map(item => {
+            const isActive = activeTab === item.id;
             return (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    ? 'bg-zinc-800/80 text-zinc-100 font-medium'
+                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
                 }`}
               >
-                {tab.icon}
-                <span>{tab.label}</span>
-                {tab.badge !== undefined && (
-                  <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full font-bold ${
-                    isActive ? 'bg-indigo-800 text-white' : 'bg-slate-800 text-slate-300'
+                {item.icon}
+                <span>{item.label}</span>
+                {item.badge !== undefined && (
+                  <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                    isActive ? 'bg-indigo-950 text-indigo-300 border border-indigo-800/60' : 'bg-zinc-800 text-zinc-400'
                   }`}>
-                    {tab.badge}
+                    {item.badge}
                   </span>
                 )}
               </button>
@@ -88,59 +82,69 @@ export const TopHeader: React.FC = () => {
         </nav>
       </div>
 
-      <div className="flex items-center gap-2.5">
+      {/* Right: Search, Actions, Telemetry */}
+      <div className="flex items-center gap-2">
         <button
           onClick={() => setCommandPaletteOpen(true)}
-          className="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-mono flex items-center gap-1.5 transition-colors"
-          title="Command Palette (Ctrl + K)"
+          className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-mono transition-colors"
         >
-          <Search className="w-3.5 h-3.5" />
-          <span>Search...</span>
-          <kbd className="px-1.5 py-0.2 rounded bg-slate-800 text-[10px] text-slate-500">⌘K</kbd>
+          <Search className="w-3 h-3" />
+          <span>Search</span>
+          <kbd className="px-1 py-0.2 rounded bg-zinc-800 text-[10px] text-zinc-500">⌘K</kbd>
         </button>
 
-        <div className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-2.5 text-xs font-mono">
-          <span className="flex items-center gap-1 text-emerald-400 font-bold">
-            <Radio className="w-3 h-3 animate-pulse" />
-            {metrics.aiDeflectionRate}% Deflection
-          </span>
-          <span className="w-[1px] h-3 bg-slate-800" />
-          <span className="flex items-center gap-1 text-slate-400">
-            <Clock className="w-3 h-3 text-cyan-400" />
-            99.8% SLA
-          </span>
+        {/* Live Deflection Badge */}
+        <div className="px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center gap-1.5 text-[11px] font-mono">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-zinc-300">{metrics.aiDeflectionRate}% AI Deflection</span>
         </div>
 
+        {/* Simulator Button */}
         <button
-          onClick={handleSimulate}
-          className="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
-          title="Inject an incoming simulated customer event"
+          onClick={triggerSimulatedCustomerMessage}
+          className="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors"
+          title="Inject incoming simulated customer event"
         >
           <MessageSquarePlus className="w-3.5 h-3.5 text-indigo-400" />
-          <span>Simulate Message</span>
+          <span>Simulate Event</span>
         </button>
 
+        {/* Customer Simulator Widget */}
         <button
           onClick={() => setCustomerSimulatorOpen(true)}
-          className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all"
-          title="Open floating end-user chat simulator"
+          className="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors"
         >
-          <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Customer View</span>
+          <Sparkles className="w-3.5 h-3.5 text-zinc-400" />
+          <span>Widget</span>
         </button>
 
+        {/* Voice SIP Simulator */}
         <button
           onClick={() => setVoiceModalOpen(true)}
-          className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-all"
+          className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors"
           title="Voice Call Telephony Simulator"
         >
-          <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
+          <PhoneCall className="w-3.5 h-3.5" />
         </button>
 
-        <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
-          <div className="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs font-bold font-mono shadow-md">
-            AR
-          </div>
+        {/* Inspector Toggle (⌘I) */}
+        {activeTab === 'inbox' && (
+          <button
+            onClick={toggleInspector}
+            className={`p-1.5 rounded-lg border transition-colors ${
+              isInspectorOpen
+                ? 'bg-indigo-950 text-indigo-300 border-indigo-800/60'
+                : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200 border-zinc-800'
+            }`}
+            title="Toggle Details & Copilot Inspector (⌘I)"
+          >
+            <PanelRight className="w-3.5 h-3.5" />
+          </button>
+        )}
+
+        {/* User Pill */}
+        <div className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700/60 text-zinc-200 flex items-center justify-center text-[10px] font-mono font-bold">
+          AR
         </div>
       </div>
     </header>

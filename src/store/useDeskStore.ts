@@ -1,16 +1,15 @@
 import { create } from 'zustand';
-import { Ticket, ChannelType, TicketStatus, ChatMessage, PriorityLevel, SentimentType } from '../types/inbox';
+import { Ticket, ChannelType, TicketStatus, ChatMessage, PriorityLevel } from '../types/inbox';
 import { KnowledgeArticle, KnowledgeGap } from '../types/knowledge';
 import { ResolutionPlaybook } from '../types/playbooks';
 import { ContactCenterMetrics } from '../types/analytics';
-import { ResponseTone, ReasoningStep, RagCitation, SuggestedResponse } from '../types/ai';
+import { ResponseTone } from '../types/ai';
 import { MOCK_TICKETS } from '../data/mockTickets';
 import { KNOWLEDGE_ARTICLES, KNOWLEDGE_GAPS } from '../data/mockKnowledge';
 import { MOCK_PLAYBOOKS } from '../data/mockPlaybooks';
 import { MOCK_METRICS } from '../data/mockAnalytics';
-import { generateReasoningSteps, getRagCitationsForQuery, generateSuggestedResponses } from '../engine/aiReasoningEngine';
 
-export type ActiveTab = 'inbox' | 'knowledge' | 'playbooks' | 'analytics' | 'simulator' | 'settings';
+export type ActiveTab = 'inbox' | 'knowledge' | 'playbooks' | 'analytics' | 'settings';
 
 interface DeskState {
   activeTab: ActiveTab;
@@ -27,6 +26,10 @@ interface DeskState {
   setSearchQuery: (query: string) => void;
   selectTicket: (ticketId: string) => void;
 
+  isInspectorOpen: boolean;
+  toggleInspector: () => void;
+  setInspectorOpen: (open: boolean) => void;
+
   activeTone: ResponseTone;
   setActiveTone: (tone: ResponseTone) => void;
 
@@ -37,6 +40,8 @@ interface DeskState {
   resolveTicket: (ticketId: string) => void;
 
   knowledgeArticles: KnowledgeArticle[];
+  selectedKnowledgeArticleId: string;
+  setSelectedKnowledgeArticleId: (id: string) => void;
   knowledgeGaps: KnowledgeGap[];
   playbooks: ResolutionPlaybook[];
   metrics: ContactCenterMetrics;
@@ -71,6 +76,10 @@ export const useDeskStore = create<DeskState>((set, get) => ({
   setSearchQuery: (query) => set({ searchQuery: query }),
   selectTicket: (ticketId) => set({ selectedTicketId: ticketId }),
 
+  isInspectorOpen: true,
+  toggleInspector: () => set((state) => ({ isInspectorOpen: !state.isInspectorOpen })),
+  setInspectorOpen: (open) => set({ isInspectorOpen: open }),
+
   activeTone: 'empathetic',
   setActiveTone: (tone) => set({ activeTone: tone }),
 
@@ -80,8 +89,8 @@ export const useDeskStore = create<DeskState>((set, get) => ({
     const newMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       ticketId,
-      sender: isWhisper ? 'human_agent' : 'human_agent',
-      senderName: isWhisper ? 'Alex Rivera (Staff Tech Lead)' : 'Alex Rivera (Staff Support)',
+      sender: 'human_agent',
+      senderName: isWhisper ? 'Alex Rivera (Staff Specialist)' : 'Alex Rivera',
       content,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       channel: 'chat',
@@ -105,7 +114,7 @@ export const useDeskStore = create<DeskState>((set, get) => ({
       tickets: state.tickets.map((t) => {
         if (t.id !== ticketId) return t;
         const newStatus: TicketStatus = t.status === 'autonomous_ai' ? 'human_escalated' : 'autonomous_ai';
-        const newAgent = newStatus === 'autonomous_ai' ? 'CogniDesk AI (Autonomous Copilot)' : 'Alex Rivera (Human Agent)';
+        const newAgent = newStatus === 'autonomous_ai' ? 'CogniDesk AI' : 'Alex Rivera';
         return {
           ...t,
           status: newStatus,
@@ -120,7 +129,7 @@ export const useDeskStore = create<DeskState>((set, get) => ({
       id: `msg-${Date.now()}`,
       ticketId,
       sender: 'ai_agent',
-      senderName: 'CogniDesk AI (Autonomous Copilot)',
+      senderName: 'CogniDesk AI',
       content: text,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       channel: 'chat',
@@ -153,6 +162,8 @@ export const useDeskStore = create<DeskState>((set, get) => ({
   },
 
   knowledgeArticles: KNOWLEDGE_ARTICLES,
+  selectedKnowledgeArticleId: KNOWLEDGE_ARTICLES[0].id,
+  setSelectedKnowledgeArticleId: (id) => set({ selectedKnowledgeArticleId: id }),
   knowledgeGaps: KNOWLEDGE_GAPS,
   playbooks: MOCK_PLAYBOOKS,
   metrics: MOCK_METRICS,
@@ -169,19 +180,22 @@ export const useDeskStore = create<DeskState>((set, get) => ({
   addNewArticle: (article) => {
     const newArt: KnowledgeArticle = {
       id: `art-${Date.now()}`,
-      title: article.title || 'New Knowledge Base Article',
+      title: article.title || 'New Article',
       slug: (article.title || 'new-article').toLowerCase().replace(/[^a-z0-9]/g, '-'),
       content: article.content || 'Article contents...',
       category: article.category || 'General',
-      author: 'Support Knowledge Lead',
+      author: 'Support Team',
       lastUpdated: new Date().toISOString().split('T')[0],
       viewCount: 1,
       helpfulScore: 100,
       vectorDimensions: 1536,
-      tags: article.tags || ['support', 'guide'],
+      tags: article.tags || ['guide'],
       isDraft: false
     };
-    set((state) => ({ knowledgeArticles: [newArt, ...state.knowledgeArticles] }));
+    set((state) => ({ 
+      knowledgeArticles: [newArt, ...state.knowledgeArticles],
+      selectedKnowledgeArticleId: newArt.id
+    }));
   },
 
   resolveGap: (gapId) => {
@@ -202,9 +216,9 @@ export const useDeskStore = create<DeskState>((set, get) => ({
 
     const randomReplies = [
       "Could you also clarify how this refund shows up on our next quarterly CSV export?",
-      "That's great! Will our API key rate limit remain at 10,000 req/min?",
-      "Thanks! Also, can we add our accounting team to the automated invoice billing notification email list?",
-      "Perfect. Thank you for the lightning-fast resolution, this is why we love CogniDesk."
+      "That is great, thanks! Will our API key rate limit remain at 10,000 req/min?",
+      "Thanks! Also, can we add our accounting team to the automated invoice billing notification list?",
+      "Thank you for the quick resolution."
     ];
     const picked = randomReplies[Math.floor(Math.random() * randomReplies.length)];
 

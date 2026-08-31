@@ -1,21 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  Workflow, 
-  Play, 
-  CheckCircle2, 
-  Cpu, 
-  CreditCard, 
-  Send, 
-  GitBranch, 
-  MessageSquare, 
-  Sparkles,
-  Zap
-} from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useDeskStore } from '../../store/useDeskStore';
-import confetti from 'canvas-confetti';
 
 export const PlaybookBuilder: React.FC = () => {
-  const { playbooks, togglePlaybookActive } = useDeskStore();
+  const { playbooks } = useDeskStore();
   const [selectedPlaybookId, setSelectedPlaybookId] = useState(playbooks[0].id);
   const [isRunningTest, setIsRunningTest] = useState(false);
   const [activeStepIdx, setActiveStepIdx] = useState<number | null>(null);
@@ -34,84 +22,96 @@ export const PlaybookBuilder: React.FC = () => {
         clearInterval(timer);
         setIsRunningTest(false);
         setActiveStepIdx(null);
-        confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
       }
-    }, 600);
+    }, 500);
   };
 
   return (
-    <div className="flex-1 h-full bg-[#080b14] overflow-y-auto p-8 space-y-6 select-none">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-extrabold text-slate-100 tracking-tight flex items-center gap-2.5">
-            <Workflow className="w-5 h-5 text-indigo-400" />
-            Automated Resolution Playbooks
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Visual trigger-condition-action workflow engine for autonomous refunds, VIP alerts, and Jira escalations.
-          </p>
+    <div className="flex-1 h-full bg-[#09090b] flex overflow-hidden select-none">
+      <div className="w-80 h-full bg-[#0d0d10] border-r border-zinc-800/80 flex flex-col shrink-0">
+        <div className="p-3.5 border-b border-zinc-800/80 flex items-center justify-between">
+          <h3 className="text-xs font-semibold text-zinc-100">Workflows</h3>
+          <span className="text-[10px] font-mono text-zinc-500">{playbooks.length} active</span>
         </div>
 
-        <button
-          onClick={handleTestRun}
-          disabled={isRunningTest}
-          className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-emerald-500 hover:to-cyan-400 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-600/25 transition-all disabled:opacity-50"
-        >
-          <Play className="w-3.5 h-3.5 fill-current" />
-          <span>{isRunningTest ? 'Executing Nodes...' : 'Test Run Workflow'}</span>
-        </button>
+        <div className="flex-1 overflow-y-auto divide-y divide-zinc-800/40">
+          {playbooks.map(pb => {
+            const isSelected = pb.id === selectedPlaybookId;
+            return (
+              <div
+                key={pb.id}
+                onClick={() => setSelectedPlaybookId(pb.id)}
+                className={`p-3.5 cursor-pointer transition-colors space-y-1.5 ${
+                  isSelected
+                    ? 'bg-zinc-800/60 border-l-2 border-indigo-500'
+                    : 'hover:bg-zinc-900/50'
+                }`}
+              >
+                <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                  <span>{pb.category}</span>
+                  <span className="text-emerald-400">{pb.successRate}% success</span>
+                </div>
+                <h4 className="text-xs font-medium text-zinc-200">{pb.name}</h4>
+                <p className="text-[11px] text-zinc-400 line-clamp-2">{pb.description}</p>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="flex gap-2 border-b border-slate-800 pb-3">
-        {playbooks.map(pb => (
+      <div className="flex-1 h-full overflow-y-auto p-8 max-w-4xl mx-auto w-full space-y-6">
+        <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+          <div>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">{activePlaybook.category}</span>
+            <h2 className="text-lg font-bold text-zinc-100 mt-0.5">{activePlaybook.name}</h2>
+            <p className="text-xs text-zinc-400 mt-1">{activePlaybook.description}</p>
+          </div>
+
           <button
-            key={pb.id}
-            onClick={() => setSelectedPlaybookId(pb.id)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-              selectedPlaybookId === pb.id
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'
-            }`}
+            onClick={handleTestRun}
+            disabled={isRunningTest}
+            className="px-3.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-medium flex items-center gap-1.5 transition-colors border border-zinc-700/60 disabled:opacity-50"
           >
-            <span>{pb.name}</span>
-            <span className="text-[10px] font-mono opacity-80">({pb.successRate}%)</span>
+            <Play className="w-3.5 h-3.5 fill-current" />
+            <span>{isRunningTest ? 'Running...' : 'Test Run'}</span>
           </button>
-        ))}
-      </div>
+        </div>
 
-      <div className="p-8 rounded-3xl bg-[#0a0e1c] border border-slate-800/80 min-h-[380px] flex items-center justify-center relative overflow-hidden">
-        <div className="flex items-center gap-8 z-10 overflow-x-auto py-4">
+        <div className="space-y-3">
           {activePlaybook.nodes.map((node, idx) => {
             const isCurrent = activeStepIdx === idx;
             const isPast = activeStepIdx !== null && activeStepIdx > idx;
 
             return (
-              <React.Fragment key={node.id}>
-                <div
-                  className={`w-64 p-4 rounded-2xl transition-all space-y-2 border ${
+              <div key={node.id} className="flex items-start gap-4">
+                <div className="flex flex-col items-center">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold transition-colors ${
                     isCurrent
-                      ? 'bg-emerald-950/40 border-emerald-400 shadow-xl shadow-emerald-500/20 scale-105'
+                      ? 'bg-indigo-600 text-white'
                       : isPast
-                      ? 'bg-indigo-950/30 border-indigo-500/50'
-                      : 'bg-slate-900 border-slate-800'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-[10px] font-mono">
-                    <span className="font-bold text-slate-400 uppercase tracking-wider">{node.type}</span>
-                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
-                      Step {idx + 1}
-                    </span>
+                      ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                      : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                  }`}>
+                    {idx + 1}
                   </div>
-                  <h4 className="text-xs font-bold text-slate-100">{node.label}</h4>
-                  <p className="text-[11px] text-slate-400 leading-snug">{node.description}</p>
+                  {idx < activePlaybook.nodes.length - 1 && (
+                    <div className="w-[1px] h-10 bg-zinc-800 mt-1" />
+                  )}
                 </div>
 
-                {idx < activePlaybook.nodes.length - 1 && (
-                  <div className="w-8 h-[2px] bg-slate-700 flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-indigo-400" />
+                <div className={`flex-1 p-3.5 rounded-xl border transition-colors ${
+                  isCurrent
+                    ? 'bg-zinc-900 border-indigo-500'
+                    : 'bg-zinc-900/60 border-zinc-800'
+                }`}>
+                  <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                    <span className="uppercase">{node.type}</span>
+                    {isCurrent && <span className="text-indigo-400">Executing...</span>}
                   </div>
-                )}
-              </React.Fragment>
+                  <h4 className="text-xs font-semibold text-zinc-200 mt-0.5">{node.label}</h4>
+                  <p className="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">{node.description}</p>
+                </div>
+              </div>
             );
           })}
         </div>

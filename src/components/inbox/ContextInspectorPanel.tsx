@@ -16,12 +16,12 @@ import {
   ChevronDown, 
   ChevronUp, 
   CreditCard, 
-  Search
+  Search,
+  X
 } from 'lucide-react';
 import { useDeskStore } from '../../store/useDeskStore';
 import { generateReasoningSteps, getRagCitationsForQuery, generateSuggestedResponses } from '../../engine/aiReasoningEngine';
 import { ResponseTone } from '../../types/ai';
-import confetti from 'canvas-confetti';
 
 export const ContextInspectorPanel: React.FC = () => {
   const { 
@@ -31,7 +31,9 @@ export const ContextInspectorPanel: React.FC = () => {
     setActiveTone, 
     applyAiResponse, 
     knowledgeArticles, 
-    sendMessage 
+    sendMessage,
+    isInspectorOpen,
+    toggleInspector
   } = useDeskStore();
 
   const [activeInspectorTab, setActiveInspectorTab] = useState<'copilot' | 'customer' | 'knowledge' | 'playbooks'>('copilot');
@@ -39,8 +41,9 @@ export const ContextInspectorPanel: React.FC = () => {
   const [isStepsExpanded, setIsStepsExpanded] = useState(true);
   const [knowledgeSearch, setKnowledgeSearch] = useState('');
 
-  const activeTicket = tickets.find(t => t.id === selectedTicketId);
+  if (!isInspectorOpen) return null;
 
+  const activeTicket = tickets.find(t => t.id === selectedTicketId);
   if (!activeTicket) return null;
 
   const { customer } = activeTicket;
@@ -53,7 +56,6 @@ export const ContextInspectorPanel: React.FC = () => {
 
   const handleApply = () => {
     applyAiResponse(activeTicket.id, selectedResponse.text);
-    confetti({ particleCount: 40, spread: 50, origin: { y: 0.6 } });
   };
 
   const handleCopy = (text: string, id: string) => {
@@ -64,7 +66,6 @@ export const ContextInspectorPanel: React.FC = () => {
 
   const handleInsertSnippet = (snippet: string) => {
     sendMessage(activeTicket.id, snippet, false);
-    confetti({ particleCount: 30, spread: 40, origin: { y: 0.6 } });
   };
 
   const tones: Array<{ id: ResponseTone; label: string }> = [
@@ -75,132 +76,129 @@ export const ContextInspectorPanel: React.FC = () => {
   ];
 
   return (
-    <div className="w-96 h-full bg-[#0a0e1c] flex flex-col justify-between shrink-0 select-none overflow-hidden text-xs font-sans">
-      <div className="p-3 bg-[#0d1222] border-b border-slate-800/80 flex items-center justify-between gap-1">
-        <button
-          onClick={() => setActiveInspectorTab('copilot')}
-          className={`flex-1 py-1.5 px-2 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
-            activeInspectorTab === 'copilot'
-              ? 'bg-indigo-600 text-white font-bold shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-          title="Autonomous AI Reasoning & RAG Grounding"
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Copilot</span>
-        </button>
+    <div className="w-80 h-full bg-[#0d0d10] flex flex-col justify-between shrink-0 select-none overflow-hidden text-xs font-sans border-l border-zinc-800/80">
+      {/* Clean Tab Header */}
+      <div className="h-13 px-3 bg-[#0c0c0e] border-b border-zinc-800/80 flex items-center justify-between">
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setActiveInspectorTab('copilot')}
+            className={`px-2 py-1 rounded text-xs transition-colors ${
+              activeInspectorTab === 'copilot'
+                ? 'bg-zinc-800 text-zinc-100 font-medium'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            Copilot
+          </button>
+          <button
+            onClick={() => setActiveInspectorTab('customer')}
+            className={`px-2 py-1 rounded text-xs transition-colors ${
+              activeInspectorTab === 'customer'
+                ? 'bg-zinc-800 text-zinc-100 font-medium'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            Customer
+          </button>
+          <button
+            onClick={() => setActiveInspectorTab('knowledge')}
+            className={`px-2 py-1 rounded text-xs transition-colors ${
+              activeInspectorTab === 'knowledge'
+                ? 'bg-zinc-800 text-zinc-100 font-medium'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            Docs
+          </button>
+          <button
+            onClick={() => setActiveInspectorTab('playbooks')}
+            className={`px-2 py-1 rounded text-xs transition-colors ${
+              activeInspectorTab === 'playbooks'
+                ? 'bg-zinc-800 text-zinc-100 font-medium'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            Actions
+          </button>
+        </div>
 
         <button
-          onClick={() => setActiveInspectorTab('customer')}
-          className={`flex-1 py-1.5 px-2 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
-            activeInspectorTab === 'customer'
-              ? 'bg-indigo-600 text-white font-bold shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-          title="Customer 360 & Revenue Profile"
+          onClick={toggleInspector}
+          className="p-1 rounded text-zinc-500 hover:text-zinc-300 transition-colors"
+          title="Close Inspector (⌘I)"
         >
-          <User className="w-3.5 h-3.5" />
-          <span>Customer</span>
-        </button>
-
-        <button
-          onClick={() => setActiveInspectorTab('knowledge')}
-          className={`flex-1 py-1.5 px-2 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
-            activeInspectorTab === 'knowledge'
-              ? 'bg-indigo-600 text-white font-bold shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-          title="Knowledge Search"
-        >
-          <BookOpen className="w-3.5 h-3.5" />
-          <span>Docs</span>
-        </button>
-
-        <button
-          onClick={() => setActiveInspectorTab('playbooks')}
-          className={`flex-1 py-1.5 px-2 rounded-xl flex items-center justify-center gap-1.5 transition-all ${
-            activeInspectorTab === 'playbooks'
-              ? 'bg-indigo-600 text-white font-bold shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-          title="Resolution Actions"
-        >
-          <Zap className="w-3.5 h-3.5" />
-          <span>Actions</span>
+          <X className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Tab Contents */}
+      <div className="flex-1 overflow-y-auto p-3.5 space-y-4">
+        {/* Tab 1: AI Copilot */}
         {activeInspectorTab === 'copilot' && (
-          <div className="space-y-4">
-            <div className="p-3 rounded-2xl bg-indigo-950/30 border border-indigo-500/30 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
-                <span className="font-bold text-slate-200">Grounded AI Confidence</span>
-              </div>
-              <span className="text-[11px] font-mono font-bold text-emerald-400">
-                {selectedResponse.confidence}% Match
+          <div className="space-y-3.5">
+            {/* Confidence */}
+            <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between text-xs">
+              <span className="text-zinc-400 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                AI Confidence
               </span>
+              <span className="font-mono font-medium text-emerald-400">{selectedResponse.confidence}%</span>
             </div>
 
-            <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+            {/* CoT Reasoning Trace */}
+            <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 space-y-2">
               <button
                 onClick={() => setIsStepsExpanded(!isStepsExpanded)}
-                className="w-full flex items-center justify-between text-xs font-bold text-slate-300 font-mono"
+                className="w-full flex items-center justify-between text-xs font-mono text-zinc-300 font-medium"
               >
                 <span className="flex items-center gap-1.5">
-                  <Cpu className="w-3.5 h-3.5 text-indigo-400" />
-                  Reasoning Trace ({reasoningSteps.length} steps)
+                  <Cpu className="w-3.5 h-3.5 text-zinc-400" />
+                  Reasoning Trace ({reasoningSteps.length})
                 </span>
-                {isStepsExpanded ? <ChevronUp className="w-3.5 h-3.5 text-slate-500" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-500" />}
+                {isStepsExpanded ? <ChevronUp className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
               </button>
 
               {isStepsExpanded && (
-                <div className="space-y-2 pt-1">
+                <div className="space-y-1.5 pt-1">
                   {reasoningSteps.map((step) => (
-                    <div key={step.id} className="p-2 rounded-xl bg-[#0d1222] border border-slate-800 space-y-1">
+                    <div key={step.id} className="p-2 rounded bg-zinc-950 border border-zinc-800/80 space-y-0.5">
                       <div className="flex items-center justify-between text-[10px] font-mono">
-                        <span className="font-bold text-slate-200 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                          {step.title}
-                        </span>
-                        <span className="text-slate-500">{step.durationMs}ms</span>
+                        <span className="text-zinc-300 font-medium">{step.title}</span>
+                        <span className="text-zinc-500">{step.durationMs}ms</span>
                       </div>
-                      <p className="text-[10px] text-slate-400 font-sans leading-relaxed">{step.description}</p>
+                      <p className="text-[11px] text-zinc-400 leading-snug">{step.description}</p>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
+            {/* RAG Citations */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">RAG Citations</label>
-              <div className="space-y-1.5">
-                {citations.map((cite) => (
-                  <div key={cite.id} className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-bold text-indigo-300 font-sans truncate">{cite.title}</span>
-                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-                        {Math.round(cite.similarityScore * 100)}%
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-sans leading-snug">{cite.snippet}</p>
+              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">Grounded Citations</span>
+              {citations.map((cite) => (
+                <div key={cite.id} className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 space-y-0.5">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-medium text-zinc-200 truncate">{cite.title}</span>
+                    <span className="text-[9px] font-mono text-zinc-400">{Math.round(cite.similarityScore * 100)}%</span>
                   </div>
-                ))}
-              </div>
+                  <p className="text-[10px] text-zinc-400 leading-snug">{cite.snippet}</p>
+                </div>
+              ))}
             </div>
 
+            {/* Tone Selector & Suggested Response */}
             <div className="space-y-2 pt-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Suggested Adaptive Reply</label>
+              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">Adaptive Response</span>
               <div className="grid grid-cols-4 gap-1 text-[10px] font-mono">
                 {tones.map((t) => (
                   <button
                     key={t.id}
                     onClick={() => setActiveTone(t.id)}
-                    className={`py-1 rounded-lg capitalize border transition-all ${
+                    className={`py-1 rounded text-center border transition-colors ${
                       activeTone === t.id
-                        ? 'bg-indigo-600 border-indigo-500 text-white font-bold'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                        ? 'bg-zinc-800 border-zinc-700 text-zinc-100 font-medium'
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
                     }`}
                   >
                     {t.label}
@@ -208,12 +206,12 @@ export const ContextInspectorPanel: React.FC = () => {
                 ))}
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-indigo-950/20 border border-indigo-500/30 space-y-2.5">
-                <p className="text-xs text-slate-200 font-sans leading-relaxed">{selectedResponse.text}</p>
-                <div className="flex items-center justify-end gap-1.5 pt-1 border-t border-indigo-500/20">
+              <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 space-y-2.5">
+                <p className="text-xs text-zinc-200 leading-relaxed">{selectedResponse.text}</p>
+                <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-zinc-800">
                   <button
                     onClick={() => handleCopy(selectedResponse.text, selectedResponse.id)}
-                    className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-[10px] font-mono flex items-center gap-1"
+                    className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] font-mono flex items-center gap-1 transition-colors"
                   >
                     {copiedId === selectedResponse.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                     <span>{copiedId === selectedResponse.id ? 'Copied' : 'Copy'}</span>
@@ -221,10 +219,10 @@ export const ContextInspectorPanel: React.FC = () => {
 
                   <button
                     onClick={handleApply}
-                    className="px-3 py-1 rounded-lg bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-[11px] font-bold flex items-center gap-1 shadow-md shadow-indigo-600/20 transition-all"
+                    className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-[11px] font-medium flex items-center gap-1 transition-colors border border-zinc-700"
                   >
                     <Send className="w-3 h-3" />
-                    <span>Apply to Chat</span>
+                    <span>Apply</span>
                   </button>
                 </div>
               </div>
@@ -232,67 +230,65 @@ export const ContextInspectorPanel: React.FC = () => {
           </div>
         )}
 
+        {/* Tab 2: Customer 360 */}
         {activeInspectorTab === 'customer' && (
-          <div className="space-y-4">
-            <div className="text-center space-y-2 pb-3 border-b border-slate-800">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 mx-auto flex items-center justify-center text-base font-bold font-mono text-indigo-300">
-                {customer.name.split(' ').map(n => n[0]).join('')}
+          <div className="space-y-3.5">
+            <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 space-y-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-lg bg-zinc-800 text-zinc-200 flex items-center justify-center font-mono font-bold text-xs">
+                  {customer.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <h4 className="font-semibold text-zinc-100 text-xs">{customer.name}</h4>
+                  <p className="text-[11px] text-zinc-400">{customer.email}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-100">{customer.name}</h3>
-                <p className="text-[11px] text-slate-400">{customer.email}</p>
-              </div>
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800 font-bold">
+
+              <div className="flex items-center gap-1.5 pt-1">
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-300">
                   {customer.planTier}
                 </span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300">
                   {customer.stripeStatus}
                 </span>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Revenue & Value</label>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
-                  <span className="text-[10px] text-slate-500 font-mono block">Monthly MRR</span>
-                  <span className="text-sm font-extrabold text-emerald-400 font-mono">${customer.mrr.toLocaleString()}</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
-                  <span className="text-[10px] text-slate-500 font-mono block">Lifetime LTV</span>
-                  <span className="text-sm font-extrabold text-indigo-400 font-mono">${customer.ltv.toLocaleString()}</span>
-                </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
+                <span className="text-[10px] text-zinc-500 font-mono block">Monthly MRR</span>
+                <span className="text-xs font-mono font-bold text-zinc-100">${customer.mrr.toLocaleString()}</span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
+                <span className="text-[10px] text-zinc-500 font-mono block">Lifetime Value</span>
+                <span className="text-xs font-mono font-bold text-zinc-100">${customer.ltv.toLocaleString()}</span>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Account Metadata</label>
-              <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2 font-mono text-[11px]">
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="flex items-center gap-1.5 font-sans"><Building2 className="w-3.5 h-3.5 text-indigo-400" /> Company</span>
-                  <span className="text-slate-200">{customer.company}</span>
-                </div>
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="flex items-center gap-1.5 font-sans"><Globe className="w-3.5 h-3.5 text-cyan-400" /> Country</span>
-                  <span className="text-slate-200">{customer.country}</span>
-                </div>
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="flex items-center gap-1.5 font-sans"><Calendar className="w-3.5 h-3.5 text-amber-400" /> Joined</span>
-                  <span className="text-slate-200">{customer.joinedDate}</span>
-                </div>
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="flex items-center gap-1.5 font-sans"><Activity className="w-3.5 h-3.5 text-purple-400" /> Total Tickets</span>
-                  <span className="text-slate-200">{customer.totalTickets}</span>
-                </div>
+            <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 space-y-2 text-xs">
+              <div className="flex justify-between text-zinc-400">
+                <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> Company</span>
+                <span className="text-zinc-200">{customer.company}</span>
+              </div>
+              <div className="flex justify-between text-zinc-400">
+                <span className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5" /> Location</span>
+                <span className="text-zinc-200">{customer.country}</span>
+              </div>
+              <div className="flex justify-between text-zinc-400">
+                <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Member Since</span>
+                <span className="text-zinc-200">{customer.joinedDate}</span>
+              </div>
+              <div className="flex justify-between text-zinc-400">
+                <span className="flex items-center gap-1.5"><Activity className="w-3.5 h-3.5" /> Tickets</span>
+                <span className="text-zinc-200">{customer.totalTickets}</span>
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Tags</label>
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">Tags</span>
               <div className="flex flex-wrap gap-1">
                 {customer.tags.map((tag, i) => (
-                  <span key={i} className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-slate-900 text-slate-300 border border-slate-800">
+                  <span key={i} className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">
                     {tag}
                   </span>
                 ))}
@@ -301,16 +297,17 @@ export const ContextInspectorPanel: React.FC = () => {
           </div>
         )}
 
+        {/* Tab 3: Knowledge Search */}
         {activeInspectorTab === 'knowledge' && (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={knowledgeSearch}
                 onChange={(e) => setKnowledgeSearch(e.target.value)}
-                placeholder="Search articles & docs..."
-                className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                placeholder="Search articles..."
+                className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
               />
             </div>
 
@@ -318,19 +315,19 @@ export const ContextInspectorPanel: React.FC = () => {
               {knowledgeArticles
                 .filter(a => a.title.toLowerCase().includes(knowledgeSearch.toLowerCase()))
                 .map(art => (
-                  <div key={art.id} className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+                  <div key={art.id} className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 space-y-1.5">
                     <div>
-                      <span className="text-[9px] font-mono text-indigo-300 px-1.5 py-0.2 rounded bg-indigo-950 border border-indigo-900">
+                      <span className="text-[9px] font-mono text-zinc-400 px-1 py-0.2 rounded bg-zinc-800">
                         {art.category}
                       </span>
-                      <h4 className="text-xs font-bold text-slate-200 mt-1">{art.title}</h4>
+                      <h4 className="text-xs font-semibold text-zinc-200 mt-1">{art.title}</h4>
                     </div>
                     <button
-                      onClick={() => handleInsertSnippet(art.content.slice(0, 180) + '...')}
-                      className="w-full py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                      onClick={() => handleInsertSnippet(art.content.slice(0, 160) + '...')}
+                      className="w-full py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[11px] font-medium flex items-center justify-center gap-1 transition-colors"
                     >
                       <Send className="w-3 h-3" />
-                      <span>Insert Snippet into Chat</span>
+                      <span>Insert Snippet</span>
                     </button>
                   </div>
                 ))}
@@ -338,35 +335,28 @@ export const ContextInspectorPanel: React.FC = () => {
           </div>
         )}
 
+        {/* Tab 4: Actions */}
         {activeInspectorTab === 'playbooks' && (
-          <div className="space-y-3">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">1-Click Resolution Playbooks</label>
+          <div className="space-y-2">
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">Quick Actions</span>
             <button
-              onClick={() => {
-                sendMessage(activeTicket.id, "I have executed an automatic Stripe pro-rated refund of $150.00 for invoice #INV-9281.", false);
-                confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
-              }}
-              className="w-full p-3 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-left space-y-1 transition-colors"
+              onClick={() => sendMessage(activeTicket.id, "I have processed an automatic Stripe refund of $150.00 for invoice #INV-9281.", false)}
+              className="w-full p-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-left space-y-0.5 transition-colors"
             >
-              <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
-                <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5" /> Execute Stripe $150 Refund</span>
-                <span className="text-[10px] font-mono">Auto</span>
+              <div className="flex items-center justify-between text-xs font-semibold text-zinc-200">
+                <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-indigo-400" /> Execute $150 Refund</span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-snug">Dispatches POST /v1/refunds and notifies billing ledger.</p>
+              <p className="text-[10px] text-zinc-500">Stripe POST /v1/refunds</p>
             </button>
 
             <button
-              onClick={() => {
-                sendMessage(activeTicket.id, "I have broadcasted an urgent priority alert to #vip-escalations Slack channel.", true);
-                confetti({ particleCount: 30, spread: 50, origin: { y: 0.6 } });
-              }}
-              className="w-full p-3 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-left space-y-1 transition-colors"
+              onClick={() => sendMessage(activeTicket.id, "Alerted #vip-escalations in Slack.", true)}
+              className="w-full p-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-left space-y-0.5 transition-colors"
             >
-              <div className="flex items-center justify-between text-xs font-bold text-indigo-300">
-                <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Escalate to #vip-retention</span>
-                <span className="text-[10px] font-mono">Slack</span>
+              <div className="flex items-center justify-between text-xs font-semibold text-zinc-200">
+                <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5 text-amber-400" /> Escalate to VIP Slack</span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-snug">Alerts Account Executive and On-Call Lead in Slack.</p>
+              <p className="text-[10px] text-zinc-500">Alerts AE and on-call lead</p>
             </button>
           </div>
         )}

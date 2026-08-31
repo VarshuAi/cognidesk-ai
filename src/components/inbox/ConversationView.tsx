@@ -6,10 +6,10 @@ import {
   Lock, 
   CheckCircle2, 
   UserCheck, 
-  FileText
+  FileText,
+  PanelRight
 } from 'lucide-react';
 import { useDeskStore } from '../../store/useDeskStore';
-import confetti from 'canvas-confetti';
 
 export const ConversationView: React.FC = () => {
   const { 
@@ -17,7 +17,9 @@ export const ConversationView: React.FC = () => {
     selectedTicketId, 
     sendMessage, 
     toggleHumanTakeover, 
-    resolveTicket 
+    resolveTicket,
+    isInspectorOpen,
+    toggleInspector
   } = useDeskStore();
 
   const [inputContent, setInputContent] = useState('');
@@ -32,7 +34,7 @@ export const ConversationView: React.FC = () => {
 
   if (!activeTicket) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#080b14] text-slate-500 text-xs">
+      <div className="flex-1 flex items-center justify-center bg-[#09090b] text-zinc-500 text-xs">
         Select a conversation from the queue to view details.
       </div>
     );
@@ -46,55 +48,62 @@ export const ConversationView: React.FC = () => {
 
   const handleResolve = () => {
     resolveTicket(activeTicket.id);
-    confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
-  };
-
-  const handleCannedMacro = (macroText: string) => {
-    setInputContent(macroText);
   };
 
   return (
-    <div className="flex-1 h-full bg-[#080b14] flex flex-col justify-between overflow-hidden border-r border-slate-800/80">
-      <div className="h-16 px-6 bg-[#0a0e1c]/80 border-b border-slate-800/80 flex items-center justify-between shrink-0 gap-4">
+    <div className="flex-1 h-full bg-[#09090b] flex flex-col justify-between overflow-hidden border-r border-zinc-800/80">
+      {/* Clean Top Bar */}
+      <div className="h-13 px-6 bg-[#0c0c0e] border-b border-zinc-800/80 flex items-center justify-between shrink-0 gap-4">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2.5">
-            <h2 className="text-sm font-bold text-slate-100 truncate">{activeTicket.title}</h2>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800 shrink-0">
+          <div className="flex items-center gap-2">
+            <h2 className="text-xs font-semibold text-zinc-100 truncate">{activeTicket.title}</h2>
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-900 text-zinc-400 border border-zinc-800 shrink-0">
               {activeTicket.ticketNumber}
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 font-sans truncate mt-0.5">
-            Customer: <span className="font-semibold text-slate-200">{activeTicket.customer.name}</span> • {activeTicket.customer.company} ({activeTicket.customer.planTier} Plan)
+          <p className="text-[11px] text-zinc-400 font-sans truncate mt-0.5">
+            {activeTicket.customer.name} • {activeTicket.customer.company} ({activeTicket.customer.planTier})
           </p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => toggleHumanTakeover(activeTicket.id)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 border ${
               activeTicket.status === 'human_escalated'
-                ? 'bg-amber-600/20 text-amber-300 border border-amber-500/40 shadow-sm'
-                : 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-600/30'
+                ? 'bg-amber-950/40 text-amber-300 border-amber-800/60'
+                : 'bg-zinc-900 text-zinc-300 border-zinc-800 hover:bg-zinc-800'
             }`}
           >
             {activeTicket.status === 'human_escalated' ? (
-              <><UserCheck className="w-3.5 h-3.5 text-amber-400" /> Human Mode Active</>
+              <><UserCheck className="w-3.5 h-3.5 text-amber-400" /> Human Mode</>
             ) : (
-              <><Bot className="w-3.5 h-3.5 text-indigo-400" /> Autonomous AI Answering</>
+              <><Bot className="w-3.5 h-3.5 text-indigo-400" /> Autonomous AI</>
             )}
           </button>
 
           <button
             onClick={handleResolve}
-            className="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-all"
+            className="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors"
           >
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
             <span>Resolve</span>
           </button>
+
+          {!isInspectorOpen && (
+            <button
+              onClick={toggleInspector}
+              className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors"
+              title="Open Inspector"
+            >
+              <PanelRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="flex-1 p-6 overflow-y-auto space-y-4">
+      {/* Message Canvas */}
+      <div className="flex-1 p-6 overflow-y-auto space-y-4 max-w-4xl mx-auto w-full">
         {activeTicket.messages.map((msg) => {
           const isCustomer = msg.sender === 'customer';
           const isAi = msg.sender === 'ai_agent';
@@ -102,10 +111,10 @@ export const ConversationView: React.FC = () => {
 
           if (isWhisper) {
             return (
-              <div key={msg.id} className="p-4 rounded-2xl bg-amber-950/25 border border-amber-800/40 text-xs text-amber-200 space-y-1.5">
+              <div key={msg.id} className="p-3 rounded-xl bg-amber-950/20 border border-amber-800/30 text-xs text-amber-200 space-y-1">
                 <div className="flex items-center gap-1.5 text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider">
-                  <Lock className="w-3.5 h-3.5" />
-                  Internal Team Note (Hidden from Customer) • {msg.timestamp}
+                  <Lock className="w-3 h-3" />
+                  Internal Note (Team only) • {msg.timestamp}
                 </div>
                 <p className="font-sans leading-relaxed text-amber-100">{msg.content}</p>
               </div>
@@ -115,40 +124,40 @@ export const ConversationView: React.FC = () => {
           return (
             <div
               key={msg.id}
-              className={`flex gap-3.5 max-w-2xl ${isCustomer ? 'mr-auto' : 'ml-auto flex-row-reverse'}`}
+              className={`flex gap-3 max-w-2xl ${isCustomer ? 'mr-auto' : 'ml-auto flex-row-reverse'}`}
             >
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
                 isCustomer 
-                  ? 'bg-slate-800 text-slate-200' 
+                  ? 'bg-zinc-800 text-zinc-300' 
                   : isAi 
-                  ? 'bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white shadow-md shadow-indigo-500/20' 
-                  : 'bg-indigo-600 text-white'
+                  ? 'bg-indigo-950 text-indigo-300 border border-indigo-800/60' 
+                  : 'bg-zinc-800 text-white'
               }`}>
-                {isCustomer ? <User className="w-4 h-4" /> : isAi ? <Bot className="w-4 h-4" /> : 'AR'}
+                {isCustomer ? <User className="w-3.5 h-3.5" /> : isAi ? <Bot className="w-3.5 h-3.5" /> : 'AR'}
               </div>
 
               <div className="space-y-1">
-                <div className={`flex items-center gap-2 text-[10px] text-slate-500 font-mono ${isCustomer ? '' : 'justify-end'}`}>
-                  <span className="font-bold text-slate-300 font-sans">{msg.senderName}</span>
+                <div className={`flex items-center gap-2 text-[10px] text-zinc-500 font-mono ${isCustomer ? '' : 'justify-end'}`}>
+                  <span className="font-semibold text-zinc-400 font-sans">{msg.senderName}</span>
                   <span>{msg.timestamp}</span>
                 </div>
 
-                <div className={`p-4 rounded-2xl text-xs leading-relaxed ${
+                <div className={`p-3.5 rounded-xl text-xs leading-relaxed ${
                   isCustomer
-                    ? 'bg-slate-900 border border-slate-800 text-slate-100 shadow-sm'
+                    ? 'bg-zinc-900 border border-zinc-800 text-zinc-200'
                     : isAi
-                    ? 'bg-[#0f172e] border border-indigo-500/30 text-indigo-50 shadow-md shadow-indigo-950/20'
-                    : 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                    ? 'bg-[#12131c] border border-indigo-500/20 text-zinc-100'
+                    : 'bg-indigo-600 text-white'
                 }`}>
                   <p className="whitespace-pre-wrap">{msg.content}</p>
 
                   {msg.ragCitations && msg.ragCitations.length > 0 && (
-                    <div className="mt-3 pt-2.5 border-t border-indigo-500/20 flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-mono text-cyan-400 font-bold flex items-center gap-1">
-                        <FileText className="w-3 h-3" /> Citations:
+                    <div className="mt-2.5 pt-2 border-t border-zinc-800 flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] font-mono text-zinc-400 font-medium flex items-center gap-1">
+                        <FileText className="w-3 h-3 text-indigo-400" /> Citations:
                       </span>
                       {msg.ragCitations.map((cite, i) => (
-                        <span key={i} className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950/80 text-cyan-300 border border-cyan-800/40">
+                        <span key={i} className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-900 text-zinc-300 border border-zinc-800">
                           {cite}
                         </span>
                       ))}
@@ -162,46 +171,34 @@ export const ConversationView: React.FC = () => {
         <div ref={chatEndRef} />
       </div>
 
-      <div className="p-4 bg-[#0a0e1c]/90 border-t border-slate-800/80 space-y-2.5">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs font-mono">
+      {/* Composer Bar */}
+      <div className="p-4 bg-[#0c0c0e] border-t border-zinc-800/80 space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center gap-1 bg-zinc-900 p-0.5 rounded-lg border border-zinc-800">
             <button
               onClick={() => setComposerMode('customer')}
-              className={`px-3 py-1 rounded-lg transition-all ${
+              className={`px-2.5 py-1 rounded text-xs transition-colors ${
                 composerMode === 'customer'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-zinc-800 text-zinc-100 font-medium'
+                  : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
-              Reply to Customer
+              Reply
             </button>
             <button
               onClick={() => setComposerMode('whisper')}
-              className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1 ${
+              className={`px-2.5 py-1 rounded text-xs transition-colors flex items-center gap-1 ${
                 composerMode === 'whisper'
-                  ? 'bg-amber-500 text-black font-bold'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-amber-950 text-amber-300 font-medium border border-amber-800/60'
+                  : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
               <Lock className="w-3 h-3" />
-              <span>Whisper Note</span>
+              <span>Internal Note</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto text-[10px] font-mono">
-            <button
-              onClick={() => handleCannedMacro("I have verified invoice #INV-9281 and processed a pro-rated refund of $150.00 to your card ending in 4092.")}
-              className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-cyan-300 hover:bg-slate-800 transition-colors"
-            >
-              ⚡ Canned: Pro-Rated Refund
-            </button>
-            <button
-              onClick={() => handleCannedMacro("You can configure Okta SAML SSO attribute mapping in Settings -> SSO Configuration.")}
-              className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-indigo-300 hover:bg-slate-800 transition-colors"
-            >
-              📄 Canned: SAML Guide
-            </button>
-          </div>
+          <span className="text-[11px] font-mono text-zinc-500">⌘ + Enter to send</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -209,26 +206,22 @@ export const ConversationView: React.FC = () => {
             value={inputContent}
             onChange={(e) => setInputContent(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
+              if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                 e.preventDefault();
                 handleSend();
               }
             }}
-            placeholder={composerMode === 'whisper' ? "Type internal team note (hidden from customer)..." : "Write your response to the customer..."}
-            className={`flex-1 h-14 p-3 rounded-xl bg-slate-900 border text-xs focus:outline-none resize-none transition-colors leading-relaxed ${
+            placeholder={composerMode === 'whisper' ? "Write internal note for team..." : "Type your message..."}
+            className={`flex-1 h-12 p-3 rounded-lg bg-zinc-900 border text-xs focus:outline-none resize-none leading-relaxed ${
               composerMode === 'whisper'
-                ? 'border-amber-500/50 text-amber-100 placeholder-amber-500/40'
-                : 'border-slate-800 text-slate-100 placeholder-slate-500 focus:border-indigo-500'
+                ? 'border-amber-800/40 text-amber-100 placeholder-amber-500/40'
+                : 'border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:border-zinc-700'
             }`}
           />
           <button
             onClick={handleSend}
             disabled={!inputContent.trim()}
-            className={`h-14 px-5 rounded-xl text-white flex items-center justify-center transition-all shadow-lg ${
-              composerMode === 'whisper'
-                ? 'bg-amber-500 hover:bg-amber-400 text-black shadow-amber-500/20'
-                : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/30'
-            }`}
+            className="h-12 px-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 text-zinc-100 text-xs font-medium flex items-center justify-center transition-colors border border-zinc-700/60"
           >
             <Send className="w-4 h-4" />
           </button>

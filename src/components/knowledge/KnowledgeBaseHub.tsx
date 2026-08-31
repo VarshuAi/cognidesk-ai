@@ -1,27 +1,13 @@
 import React, { useState } from 'react';
-import { 
-  BookOpen, 
-  Plus, 
-  Search, 
-  FileText, 
-  Sparkles, 
-  CheckCircle2, 
-  Clock, 
-  Tag, 
-  Layers, 
-  TrendingUp, 
-  AlertTriangle,
-  ArrowRight
-} from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useDeskStore } from '../../store/useDeskStore';
 import { ArticleEditorModal } from './ArticleEditorModal';
-import confetti from 'canvas-confetti';
 
 export const KnowledgeBaseHub: React.FC = () => {
   const { 
     knowledgeArticles, 
-    knowledgeGaps, 
-    resolveGap, 
+    selectedKnowledgeArticleId, 
+    setSelectedKnowledgeArticleId,
     setArticleModalOpen 
   } = useDeskStore();
 
@@ -34,134 +20,109 @@ export const KnowledgeBaseHub: React.FC = () => {
     return matchesCat && matchesSearch;
   });
 
+  const selectedArticle = knowledgeArticles.find(a => a.id === selectedKnowledgeArticleId) || knowledgeArticles[0];
   const categories = ['all', 'Billing & Invoicing', 'API & Developer Webhooks', 'Security, SSO & SAML', 'Plans, Upgrades & Add-ons'];
 
-  const handleDraftFromGap = (gapId: string, title: string) => {
-    resolveGap(gapId);
-    setArticleModalOpen(true);
-    confetti({ particleCount: 40, spread: 50, origin: { y: 0.6 } });
-  };
-
   return (
-    <div className="flex-1 h-full bg-[#080b14] overflow-y-auto p-8 space-y-8 select-none">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-extrabold text-slate-100 tracking-tight flex items-center gap-2.5">
-            <BookOpen className="w-5 h-5 text-indigo-400" />
-            Knowledge Base & RAG Vector Hub
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Grounded enterprise documentation index with real-time vector embeddings and missing knowledge discovery.
-          </p>
-        </div>
-
-        <button
-          onClick={() => setArticleModalOpen(true)}
-          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Article</span>
-        </button>
-      </div>
-
-      <div className="p-5 rounded-3xl bg-[#0c1020] border border-amber-500/30 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <h3 className="text-sm font-bold text-amber-200">AI-Discovered Knowledge Gaps</h3>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">
-              {knowledgeGaps.filter(g => g.status === 'open').length} High-Impact Gaps
-            </span>
-          </div>
-          <span className="text-[11px] text-slate-500 font-mono">Discovered from ungrounded customer queries</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {knowledgeGaps.map(gap => (
-            <div key={gap.id} className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-3 flex flex-col justify-between">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
-                  <span className="text-amber-400 font-bold">{gap.occurrences} customer requests</span>
-                  <span>Impact: {gap.impactScore}/10</span>
-                </div>
-                <h4 className="text-xs font-bold text-slate-200 line-clamp-2 leading-snug">{gap.unansweredQuery}</h4>
-              </div>
-
-              <button
-                onClick={() => handleDraftFromGap(gap.id, gap.suggestedTitle)}
-                className="w-full py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Auto-Draft Article</span>
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-1.5 overflow-x-auto text-xs font-mono">
-            {categories.map(c => (
-              <button
-                key={c}
-                onClick={() => setSelectedCategory(c)}
-                className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-all ${
-                  selectedCategory === c
-                    ? 'bg-indigo-600 text-white font-bold'
-                    : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                {c === 'all' ? 'All Collections' : c}
-              </button>
-            ))}
+    <div className="flex-1 h-full bg-[#09090b] flex overflow-hidden select-none">
+      <div className="w-80 h-full bg-[#0d0d10] border-r border-zinc-800/80 flex flex-col shrink-0">
+        <div className="p-3.5 border-b border-zinc-800/80 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-semibold text-zinc-100">Knowledge Base</h3>
+            <button
+              onClick={() => setArticleModalOpen(true)}
+              className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-medium flex items-center gap-1 transition-colors border border-zinc-700/60"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>New Doc</span>
+            </button>
           </div>
 
-          <div className="relative w-64">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Filter articles & tags..."
-              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+              placeholder="Search docs..."
+              className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-700"
             />
+          </div>
+
+          <div className="flex gap-1 overflow-x-auto pb-0.5 text-xs">
+            {categories.map(c => (
+              <button
+                key={c}
+                onClick={() => setSelectedCategory(c)}
+                className={`px-2 py-1 rounded-md text-[11px] font-medium transition-colors whitespace-nowrap ${
+                  selectedCategory === c
+                    ? 'bg-zinc-800 text-zinc-100'
+                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                }`}
+              >
+                {c === 'all' ? 'All' : c.split(' ')[0]}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredArticles.map(art => (
-            <div
-              key={art.id}
-              className="p-5 rounded-2xl bg-[#0a0e1c] border border-slate-800 hover:border-indigo-500/50 transition-all space-y-3 group"
-            >
-              <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
-                <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-indigo-300">
-                  {art.category}
-                </span>
-                <span className="text-emerald-400">{art.helpfulScore}% Helpful</span>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-bold text-slate-100 group-hover:text-indigo-300 transition-colors">
-                  {art.title}
-                </h3>
-                <p className="text-xs text-slate-400 mt-1 line-clamp-3 leading-relaxed">
-                  {art.content.replace(/##|\`\`\`|###/g, '')}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[10px] font-mono text-slate-500">
-                <div className="flex items-center gap-1">
-                  {art.tags.map(t => (
-                    <span key={t} className="px-1.5 py-0.2 rounded bg-slate-900 text-slate-400">#{t}</span>
-                  ))}
+        <div className="flex-1 overflow-y-auto divide-y divide-zinc-800/40">
+          {filteredArticles.map(art => {
+            const isSelected = art.id === selectedArticle?.id;
+            return (
+              <div
+                key={art.id}
+                onClick={() => setSelectedKnowledgeArticleId(art.id)}
+                className={`p-3.5 cursor-pointer transition-colors space-y-1 ${
+                  isSelected
+                    ? 'bg-zinc-800/60 border-l-2 border-indigo-500'
+                    : 'hover:bg-zinc-900/50'
+                }`}
+              >
+                <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                  <span>{art.category}</span>
+                  <span>{art.helpfulScore}% helpful</span>
                 </div>
-                <span>1536-dim Vector Embed</span>
+                <h4 className="text-xs font-medium text-zinc-200 line-clamp-1">{art.title}</h4>
+                <p className="text-[11px] text-zinc-400 line-clamp-1">{art.content.replace(/##|\`\`\`|###/g, '')}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex-1 h-full overflow-y-auto p-8 max-w-3xl mx-auto w-full">
+        {selectedArticle ? (
+          <div className="space-y-6">
+            <div className="space-y-2 border-b border-zinc-800 pb-4">
+              <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
+                <span>{selectedArticle.category}</span>
+                <span>•</span>
+                <span>Updated {selectedArticle.lastUpdated}</span>
+                <span>•</span>
+                <span>{selectedArticle.vectorDimensions}-dim vector</span>
+              </div>
+              <h1 className="text-xl font-bold text-zinc-100">{selectedArticle.title}</h1>
+              <div className="flex items-center gap-1.5 pt-1">
+                {selectedArticle.tags.map(t => (
+                  <span key={t} className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">
+                    #{t}
+                  </span>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+
+            <div className="prose prose-invert max-w-none text-xs leading-relaxed space-y-4 text-zinc-300">
+              <pre className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 font-mono text-xs overflow-x-auto whitespace-pre-wrap">
+                {selectedArticle.content}
+              </pre>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full text-zinc-500 text-xs">
+            Select an article from the left sidebar to view contents.
+          </div>
+        )}
       </div>
 
       <ArticleEditorModal />
