@@ -8,7 +8,8 @@ import {
   Smile, 
   Frown, 
   Meh, 
-  Flame
+  Flame, 
+  Search
 } from 'lucide-react';
 import { useDeskStore } from '../../store/useDeskStore';
 import { ChannelType, SentimentType } from '../../types/inbox';
@@ -37,7 +38,8 @@ export const TicketList: React.FC = () => {
     setChannelFilter, 
     statusFilter, 
     setStatusFilter, 
-    searchQuery 
+    searchQuery,
+    setSearchQuery 
   } = useDeskStore();
 
   const filteredTickets = tickets.filter(t => {
@@ -52,22 +54,49 @@ export const TicketList: React.FC = () => {
   });
 
   const channels: Array<{ id: ChannelType | 'all'; label: string }> = [
-    { id: 'all', label: 'All Channels' },
-    { id: 'chat', label: 'Live Chat' },
+    { id: 'all', label: 'All' },
+    { id: 'chat', label: 'Chat' },
     { id: 'whatsapp', label: 'WhatsApp' },
     { id: 'email', label: 'Email' },
-    { id: 'voice', label: 'Voice Calls' },
+    { id: 'voice', label: 'Voice' },
   ];
 
   return (
     <div className="w-80 h-full bg-[#0a0e1c] border-r border-slate-800/80 flex flex-col shrink-0 select-none">
-      <div className="p-3 border-b border-slate-800/80 space-y-2">
-        <div className="flex items-center justify-between text-xs font-mono text-slate-400">
-          <span className="font-bold text-slate-200 uppercase tracking-wider text-[10px]">Queue ({filteredTickets.length})</span>
+      <div className="p-3.5 border-b border-slate-800/80 space-y-2.5">
+        <div className="relative">
+          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Filter queue..."
+            className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+
+        <div className="flex gap-1 overflow-x-auto pb-0.5 text-[11px] font-medium">
+          {channels.map(c => (
+            <button
+              key={c.id}
+              onClick={() => setChannelFilter(c.id)}
+              className={`px-2.5 py-1 rounded-lg whitespace-nowrap transition-all ${
+                channelFilter === c.id
+                  ? 'bg-indigo-600 text-white font-semibold shadow-sm'
+                  : 'bg-slate-900/80 text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5">
+          <span className="font-bold uppercase tracking-wider text-slate-400">Queue ({filteredTickets.length})</span>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="bg-slate-900 border border-slate-800 rounded px-2 py-0.5 text-[10px] text-slate-300 focus:outline-none cursor-pointer"
+            className="bg-slate-900 border border-slate-800 rounded px-2 py-0.5 text-slate-300 focus:outline-none cursor-pointer"
           >
             <option value="all">All Statuses</option>
             <option value="autonomous_ai">Autonomous AI</option>
@@ -75,22 +104,6 @@ export const TicketList: React.FC = () => {
             <option value="waiting_customer">Waiting</option>
             <option value="resolved">Resolved</option>
           </select>
-        </div>
-
-        <div className="flex gap-1 overflow-x-auto pb-1 text-[11px] font-medium">
-          {channels.map(c => (
-            <button
-              key={c.id}
-              onClick={() => setChannelFilter(c.id)}
-              className={`px-2.5 py-1 rounded-lg whitespace-nowrap transition-all ${
-                channelFilter === c.id
-                  ? 'bg-indigo-600 text-white font-semibold'
-                  : 'bg-slate-900/80 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {c.label}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -139,7 +152,7 @@ export const TicketList: React.FC = () => {
                 </p>
               </div>
 
-              <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono pt-1">
+              <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono pt-0.5">
                 <span className="truncate max-w-[120px] text-slate-400 font-sans font-medium">{ticket.customer.name}</span>
                 <span className="flex items-center gap-1 text-emerald-400">
                   <Clock className="w-3 h-3" />
