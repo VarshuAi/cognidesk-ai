@@ -1,119 +1,68 @@
-# 🤖 CogniDesk AI — Autonomous Enterprise Customer Support & Multi-Channel Contact Center
+<!-- VARSHUAI-REDESIGN-v2 -->
+# ⚡ Cognidesk Ai
 
-<p align="center">
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" />
-  <img src="https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/React-19.x-61dafb?logo=react" alt="React" />
-  <img src="https://img.shields.io/badge/Vite-8.x-646CFF?logo=vite" alt="Vite" />
-  <img src="https://img.shields.io/badge/TailwindCSS-v4-38B2AC?logo=tailwind-css" alt="Tailwind v4" />
-  <img src="https://img.shields.io/badge/Architecture-Clean%20Enterprise-emerald" alt="Design" />
-</p>
+> **CogniDesk AI — Enterprise Autonomous Customer Support & Multi-Channel Contact Center (Live Omnichannel Inbox, RAG Copilot, HITL Escalation, Visual Playbooks, CSAT Telemetry)**  
+> *An open-source utility by [VarshuAi](https://github.com/VarshuAi) • Part of the [Velorio Labs](https://github.com/VelorioLabs) Ecosystem.*
+
+<div align="center">
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald?style=flat-square&labelColor=0d1117)](LICENSE)
+[![Author: VarshuAi](https://img.shields.io/badge/Author-VarshuAi-ccff00?style=flat-square&labelColor=0d1117)](https://github.com/VarshuAi)
+[![Ecosystem: VelorioLabs](https://img.shields.io/badge/Ecosystem-VelorioLabs-38bdf8?style=flat-square&labelColor=0d1117)](https://github.com/VelorioLabs)
+![Language: TypeScript](https://img.shields.io/badge/Language-TypeScript-facc15?style=flat-square&labelColor=0d1117)
+
+</div>
 
 ---
 
-## 🌟 Overview
+## 🎯 Overview
 
-**CogniDesk AI** is an enterprise-grade, autonomous customer support studio and multi-channel contact center. Designed with a calm, high-efficiency **Linear / Stripe aesthetic**, CogniDesk combines **verifiable RAG grounding**, real-time **Chain-of-Thought (CoT) reasoning traces**, **1-click resolution playbooks**, and seamless **Autonomous AI ⇋ Human Agent handovers**.
+`cognidesk-ai` is a focused, lightweight, and deterministic tool designed for developers and power users. Engineered from first principles with zero bloat, high responsiveness, and clean modular code.
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│  SYSTEM ARCHITECTURE: COGNIDESK-AI                                     │
+│  MAINTAINER: VarshuAi (VARSHAN) · VELORIO LABS                         │
+│  SECURITY: DETERMINISTIC · ZERO TELEMETRY TRACKING                     │
+└────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## ⚡ Key Highlights
 
-- **🧠 Transparent Chain-of-Thought (CoT) Reasoning**: Inspect exact decision steps, grounded citations, and execution telemetry for every AI response.
-- **💬 Distraction-Free Conversation Canvas**: High-readability chat streams with Markdown support, sentiment analysis, and private team whisper notes (`⌘ + Enter` composer).
-- **🪟 Collapsible Context Inspector (`⌘I`)**:
-  - **Copilot**: Grounded knowledge citations, real-time confidence rating, and tone switcher (*Empathetic*, *Professional*, *Concise*, *Technical*).
-  - **Customer 360**: Real-time revenue telemetry (MRR, Lifetime Value, Stripe Status, SLA clocks).
-  - **Docs Search**: In-context knowledge base lookup with 1-click snippet insertion into chat.
-  - **Resolution Playbooks**: 1-click execution for Stripe pro-rated refunds, VIP Slack alarms, and Jira tickets.
-- **📚 Integrated Knowledge Base (GitBook / Mintlify Style)**: Category-driven documentation hub with high-dimensional vector embeddings and live gap resolution.
-- **⚡ Automated Resolution Workflows**: Visual node pipeline with step-by-step test execution.
-- **📊 Real-Time Analytics & CSAT Telemetry**: Live deflection rate tracking, hourly customer sentiment trends, and channel volume distribution.
-- **🎭 Multi-Channel Simulation Studio**: Built-in end-user widget simulator and Voice SIP telephony testing modal.
-- **⌨️ Global Command Palette (`⌘K`)**: Instant fuzzy search across tickets, docs, workflows, and settings.
+- 🚀 **High Performance**: Optimized algorithmic execution with minimal system overhead.
+- 🛡️ **Zero Tracking**: Completely privacy-focused; runs entirely locally or client-side.
+- 🧩 **Clean Architecture**: Minimal dependencies and self-contained code structure.
+- 📦 **Plug & Play**: Instant deployment and execution across modern environments.
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+## 🚀 Quickstart & Usage
 
-```
-cognidesk-ai/
-├── src/
-│   ├── components/
-│   │   ├── inbox/              # TicketList, ConversationView, ContextInspectorPanel
-│   │   ├── knowledge/          # KnowledgeBaseHub, ArticleEditorModal
-│   │   ├── playbooks/          # PlaybookBuilder (Visual Node Runner)
-│   │   ├── analytics/          # AnalyticsDashboard (CSAT & Deflection metrics)
-│   │   ├── settings/           # IntegrationSettings (Stripe, Slack, Okta, Jira)
-│   │   ├── simulation/         # CustomerWidgetModal, VoiceCallModal
-│   │   └── layout/             # TopHeader, CommandPalette
-│   ├── data/                   # Mock omnichannel tickets, docs, playbooks, analytics
-│   ├── engine/                 # AI Reasoning Engine, RAG similarity matcher, tone switcher
-│   ├── store/                  # Zustand state management
-│   ├── types/                  # Domain TypeScript interfaces
-│   ├── App.tsx                 # Root application layout
-│   └── main.tsx                # Entry point
-├── index.html
-├── package.json
-├── tsconfig.json
-└── vite.config.ts
-```
-
-- **Frontend**: React 19, TypeScript 5.9, Vite 8
-- **Styling**: Tailwind CSS v4 (`@tailwindcss/vite`), Obsidian & Zinc Design Tokens
-- **Icons**: Lucide React
-- **State Management**: Zustand
-- **Utility**: clsx, tailwind-merge, canvas-confetti
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-
-### Installation
+### 1. Clone the Repository
 ```bash
-# 1. Clone the repository
 git clone https://github.com/VarshuAi/cognidesk-ai.git
 cd cognidesk-ai
-
-# 2. Install dependencies
-npm install
-
-# 3. Start local development server
-npm run dev
 ```
 
-Visit `http://localhost:5173` in your browser.
-
----
-
-## 🧪 Production Build
-
+### 2. Execution
+Open `index.html` directly in your browser or run with a local static server:
 ```bash
-# Compile TypeScript and bundle production assets
-npm run build
-
-# Preview production build locally
-npm run preview
+npx serve . -p 3000
 ```
 
 ---
 
-## 🤝 Contributing
+## 🌐 Ecosystem
 
-Contributions are welcome! Please read [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on our code of conduct and development workflow.
-
----
-
-## 🔒 Security
-
-For security vulnerabilities and bug reports, please review our [`SECURITY.md`](./SECURITY.md) policy.
+Explore more cutting-edge sovereign developer tools, security scanners, and AI systems at **[Velorio Labs](https://github.com/VelorioLabs)**:
+- 🛰️ **[AetherEye](https://github.com/VelorioLabs/AetherEye)** — Tactical Global Satellite & ADS-B Flight Radar Terminal
+- 🎬 **[TeleVortex](https://github.com/VelorioLabs/TeleVortex)** — Universal Media Decompiler & Transcoder Bot
+- 🛡️ **[Termux-Vault](https://github.com/VelorioLabs/Termux-Vault)** — DoD 5220.22-M Multi-Pass File Shredder
 
 ---
 
-## 📄 License
+## 🛡️ License
 
-This project is licensed under the [MIT License](./LICENSE) © 2026 **Varshan Gowda (VarshuAi)**.
+Released under the **[MIT License](LICENSE)**. Engineered with precision by **[VarshuAi](https://github.com/VarshuAi)**.
